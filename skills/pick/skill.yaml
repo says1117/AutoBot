@@ -1,0 +1,23 @@
+name: pick
+description: >
+  Grasp an object and lift it clear of the surface. Fails if the gripper
+  closes on nothing, or if the object slips before reaching lift height.
+
+timeout_s: 15.0
+
+args:
+  object_id:
+    type: string
+    description: Which object to pick up.
+    enum: [red_cube, blue_cube, green_cube]
+
+required: [object_id]
+
+preconditions:
+  - gripper_empty
+  - object_within_reach
+
+success:
+  predicate: object_height_above_surface
+  threshold: 0.10
+  timeout_is_failure: true

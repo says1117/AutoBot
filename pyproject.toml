@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "autobot"
+version = "0.1.0"
+description = "Language-directed robot control in NVIDIA Isaac Sim"
+requires-python = ">=3.10"
+dependencies = [
+    "pydantic>=2.0",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0", "ruff>=0.1"]
+
+# NOTE: isaaclab / isaacsim are intentionally NOT listed here.
+# planner/ and evals/ must stay importable without them so they run on a
+# laptop and in CPU-only CI. Only skills/isaac_runner.py and sim/ may
+# import Isaac. sim/ and csrc/ are not Python packages.
+
+[tool.setuptools]
+packages = ["skills", "planner", "evals"]
+
+[tool.setuptools.package-data]
+skills = ["*/skill.yaml"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

@@ -1,0 +1,37 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# Secrets
+.env
+*.key
+
+# RL training artifacts -- these get LARGE, never commit
+logs/
+runs/
+outputs/
+wandb/
+checkpoints/
+*.pt
+*.pth
+*.onnx
+*.engine
+
+# Isaac Sim / Omniverse caches
+.nvidia-omniverse/
+kit/
+*.usd.bak
+
+# CUDA extension build products
+build/
+*.so
+*.o
+
+# OS
+.DS_Store
+Thumbs.db
