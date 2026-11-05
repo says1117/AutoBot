@@ -40,4 +40,4 @@ def run_instruction(instruction: str, attempter, max_rounds: int = 5) -> str:
 
 
 if __name__ == "__main__":
-    print(run_instruction("Pick up the red cube.", StubAttempter(seed=0)))
+    print(run_instruction("Pick up the red cube.", StubAttempter(seed=1, success_rate=0.0)))

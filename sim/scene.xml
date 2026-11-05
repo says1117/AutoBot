@@ -1,0 +1,21 @@
+<mujoco>
+  <visual><global offwidth="640" offheight="480"/></visual>
+  <worldbody>
+    <light pos="0 0 2" dir="0 0 -1"/>
+    <geom name="floor" type="plane" size="2 2 0.1" rgba="0.8 0.8 0.8 1"/>
+    <camera name="overhead" pos="0.5 -0.7 0.8" xyaxes="1 0 0 0 0.7 0.7" fovy="45"/>
+
+    <body name="red_cube" pos="0.4 0.1 0.025">
+      <freejoint/>
+      <geom type="box" size="0.025 0.025 0.025" rgba="1 0 0 1"/>
+    </body>
+    <body name="green_cube" pos="0.5 0.0 0.025">
+      <freejoint/>
+      <geom type="box" size="0.025 0.025 0.025" rgba="0 1 0 1"/>
+    </body>
+    <body name="blue_cube" pos="0.6 0.15 0.025">
+      <freejoint/>
+      <geom type="box" size="0.025 0.025 0.025" rgba="0 0 1 1"/>
+    </body>
+  </worldbody>
+</mujoco>
