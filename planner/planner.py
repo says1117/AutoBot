@@ -41,6 +41,9 @@ def run_instruction(instruction: str, attempter, max_rounds: int = 5) -> str:
             spec = registry[call.function.name]
             # converts JSON text into a dict 
             args = json.loads(call.function.arguments)
+            if args["object_id"] not in objects:
+                messages.append({"role": "tool", "tool_call_id": call.id, "content": "Error: object not visible."})
+                continue
             # actually runs the skill and returns a SkillResult plus the reason
             result = run_skill(spec, args, attempter)
             print(f"round {round_num}: {call.function.name}({args}) -> {result.outcome}")
@@ -50,4 +53,4 @@ def run_instruction(instruction: str, attempter, max_rounds: int = 5) -> str:
 
 
 if __name__ == "__main__":
-    print(run_instruction("Pick up the red cube.", StubAttempter(seed=1, success_rate=0.0)))
+    print(run_instruction("Pick up the red cube.", StubAttempter(seed=1)))
