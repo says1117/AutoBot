@@ -1,5 +1,6 @@
 import json
 import os
+from perception.scene import observe
 
 from openai import OpenAI
 
@@ -7,6 +8,11 @@ from skills.registry import load_registry
 from skills.runner import StubAttempter, run_skill
 
 MODEL = "nvidia/nemotron-3.5-lightning-30b-a3b"
+SYSTEM_PROMPT = (
+    "You control a robot arm. Only act on objects the camera can see. "
+    "If the requested object is not visible, do not call a skill. Explain why instead. "
+    "After a skill finishes, report what happened."
+)
 
 
 def run_instruction(instruction: str, attempter, max_rounds: int = 5) -> str:
@@ -14,7 +20,11 @@ def run_instruction(instruction: str, attempter, max_rounds: int = 5) -> str:
                     api_key=os.environ["LLM_API_KEY"], timeout=60)
     registry = load_registry()
     tools = [spec.to_tool_schema() for spec in registry.values()]
-    messages = [{"role": "user", "content": instruction}]
+    objects = observe()
+    messages = [
+        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "user", "content": f"Camera sees (x, y, z in meters): {objects}\n\nInstruction: {instruction}"},
+    ]
 
     # round of conversations with the model up to max_rounds times
     for round_num in range(max_rounds):
