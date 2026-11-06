@@ -1,0 +1,54 @@
+[
+  {
+    "policy": "pick_policy",
+    "attempter": "ppo",
+    "env": "PandaPickCube",
+    "episodes": 1024,
+    "seed": 1000,
+    "lift_threshold_m": 0.1,
+    "hold_s": 1.0,
+    "successes": 0,
+    "success_rate": 0.0,
+    "mean_best_lift_m": 0.002,
+    "mean_final_target_error_m": 0.341
+  },
+  {
+    "policy": "pick_policy_seed1",
+    "attempter": "ppo",
+    "env": "PandaPickCube",
+    "episodes": 1024,
+    "seed": 1000,
+    "lift_threshold_m": 0.1,
+    "hold_s": 1.0,
+    "successes": 0,
+    "success_rate": 0.0,
+    "mean_best_lift_m": 0.0,
+    "mean_final_target_error_m": 0.375
+  },
+  {
+    "policy": "pick_policy_seed2",
+    "attempter": "ppo",
+    "env": "PandaPickCube",
+    "episodes": 1024,
+    "seed": 1000,
+    "lift_threshold_m": 0.1,
+    "hold_s": 1.0,
+    "successes": 1022,
+    "success_rate": 0.998046875,
+    "mean_best_lift_m": 0.304,
+    "mean_final_target_error_m": 0.008
+  },
+  {
+    "policy": "pick_policy_seed3",
+    "attempter": "ppo",
+    "env": "PandaPickCube",
+    "episodes": 1024,
+    "seed": 1000,
+    "lift_threshold_m": 0.1,
+    "hold_s": 1.0,
+    "successes": 1020,
+    "success_rate": 0.99609375,
+    "mean_best_lift_m": 0.301,
+    "mean_final_target_error_m": 0.008
+  }
+]

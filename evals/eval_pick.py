@@ -46,7 +46,8 @@ def evaluate(policy_path, parts, n_episodes, seed):
 
     key = jax.random.PRNGKey(seed)
     state = reset(jax.random.split(key, n_episodes))
-    start_height = state.data.xpos[:, box, 2]
+    # xpos is all zeros until the first step, so read the height from qpos
+    start_height = state.data.qpos[:, env._obj_qposadr + 2]
 
     # counts how many steps in a row each cube has stayed lifted
     held = jp.zeros(n_episodes, dtype=jp.int32)
