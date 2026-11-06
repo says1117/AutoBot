@@ -1,0 +1,15 @@
+[
+  {
+    "policy": "pick_policy",
+    "attempter": "ppo",
+    "env": "PandaPickCube",
+    "episodes": 256,
+    "seed": 1000,
+    "lift_threshold_m": 0.1,
+    "hold_s": 1.0,
+    "successes": 0,
+    "success_rate": 0.0,
+    "mean_best_lift_m": 0.032,
+    "mean_final_target_error_m": 0.342
+  }
+]
