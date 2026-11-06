@@ -15,12 +15,12 @@ SYSTEM_PROMPT = (
 )
 
 
-def run_instruction(instruction: str, attempter, max_rounds: int = 5) -> str:
+def run_instruction(instruction: str, attempter, max_rounds: int = 5, observe_fn=observe) -> str:
     client = OpenAI(base_url="https://integrate.api.nvidia.com/v1",
                     api_key=os.environ["LLM_API_KEY"], timeout=60)
     registry = load_registry()
     tools = [spec.to_tool_schema() for spec in registry.values()]
-    objects = observe()
+    objects = observe_fn()
     messages = [
         {"role": "system", "content": SYSTEM_PROMPT},
         {"role": "user", "content": f"Camera sees (x, y, z in meters): {objects}\n\nInstruction: {instruction}"},
