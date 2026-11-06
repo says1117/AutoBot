@@ -25,7 +25,8 @@ sim = [
     "playground==0.2.0",
     "warp-lang==1.19.0",
 ]
-dev = ["pytest>=9.0", "ruff>=0.16"]
+# ruff is exact so a new release can't fail CI by itself
+dev = ["pytest>=9.0", "ruff==0.16.4"]
 
 [tool.setuptools]
 packages = ["evals", "perception", "planner", "sim", "skills", "training"]
@@ -36,6 +37,10 @@ skills = ["*/skill.yaml"]
 
 [tool.ruff]
 line-length = 100
+
+[tool.ruff.lint]
+# timestamps here only name local result and log files, so local time is what we want
+ignore = ["DTZ005"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

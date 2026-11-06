@@ -1,6 +1,6 @@
 import mujoco
 
-from perception.camera import SCENE, WIDTH, HEIGHT, capture
+from perception.camera import HEIGHT, SCENE, WIDTH, capture
 from perception.locate import COLOR_RANGES, locate
 
 

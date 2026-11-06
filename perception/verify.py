@@ -1,9 +1,10 @@
 import base64
-import os
 import re
 
 import cv2
-from openai import APIError, OpenAI
+from openai import APIError
+
+from planner.runtime import log, make_client
 
 MODEL = "nvidia/nemotron-3.5-super-vl-120b-a12b"
 PROMPT = (
@@ -16,8 +17,7 @@ class VLMVerifier:
     """Asks a vision-language model whether a photo shows the pick worked."""
 
     def __init__(self, client=None, tries: int = 2):
-        self.client = client or OpenAI(base_url="https://integrate.api.nvidia.com/v1",
-                                       api_key=os.environ["LLM_API_KEY"], timeout=60, max_retries=0)
+        self.client = client or make_client(max_retries=0)
         self.tries = tries
 
     def confirm(self, rgb, object_id: str) -> bool | None:
@@ -34,10 +34,12 @@ class VLMVerifier:
                 response = self.client.chat.completions.create(
                     model=MODEL, temperature=0, max_tokens=2048,
                     messages=[{"role": "user", "content": content}])
-            except APIError:
+            except APIError as error:
+                log.warning("photo check request failed: %s", type(error).__name__)
                 continue
             # the model may reason first, so its last YES or NO is the answer
             words = re.findall(r"\b(YES|NO)\b", (response.choices[0].message.content or "").upper())
             if words:
                 return words[-1] == "YES"
+            log.warning("photo check reply had no YES or NO")
         return None

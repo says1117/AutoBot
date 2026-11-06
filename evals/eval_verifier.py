@@ -1,5 +1,6 @@
 import argparse
 import json
+import sys
 from datetime import datetime
 
 import jax
@@ -11,6 +12,7 @@ from evals.eval_pick import RESULTS, build
 from perception.locate import CUBE_RGBA
 from perception.pick_camera import CubeTracker, PickCamera, hide_cube_state
 from perception.verify import MODEL, VLMVerifier
+from planner.runtime import SetupError
 from skills.policy_attempter import POLICY_PATH
 from skills.registry import load_registry
 
@@ -40,6 +42,8 @@ def final_poses(camera, parts, n_episodes, seed):
 
 
 def evaluate(n_episodes, seed, per_class, wrong_color):
+    # built first, so a missing key shows up before the slow startup
+    verifier = VLMVerifier()
     parts = build()
     camera = PickCamera(parts[1])
     camera.paint_cube("green_cube")
@@ -60,7 +64,6 @@ def evaluate(n_episodes, seed, per_class, wrong_color):
         asked = colors[(colors.index(question["paint"]) + 3) % len(colors)]
         questions.append({**question, "asked": asked, "kind": "wrong_color"})
 
-    verifier = VLMVerifier()
     for question in questions:
         camera.paint_cube(question["paint"])
         rgb, _ = camera.take_photos(last[question["episode"]], "side")
@@ -95,7 +98,10 @@ if __name__ == "__main__":
     parser.add_argument("--wrong-color", type=int, default=10)
     args = parser.parse_args()
 
-    result = evaluate(args.episodes, args.seed, args.per_class, args.wrong_color)
+    try:
+        result = evaluate(args.episodes, args.seed, args.per_class, args.wrong_color)
+    except SetupError as error:
+        sys.exit(f"setup error: {error}")
     print({key: value for key, value in result.items() if key != "details"}, flush=True)
 
     RESULTS.mkdir(exist_ok=True)

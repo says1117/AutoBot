@@ -1,9 +1,9 @@
 import json
-import os
+
+from openai import APIError
+
 from perception.scene import observe
-
-from openai import OpenAI
-
+from planner.runtime import log, make_client
 from skills.registry import load_registry
 from skills.runner import StubAttempter, run_skill
 
@@ -15,12 +15,36 @@ SYSTEM_PROMPT = (
 )
 
 
+def check_call(call, registry: dict, objects: dict):
+    """Returns (spec, args, None) for a call that can run, or (None, None, error) if it can't."""
+    spec = registry.get(call.function.name)
+    if spec is None:
+        return None, None, f"Error: there is no skill named {call.function.name}."
+
+    # converts JSON text into a dict
+    try:
+        args = json.loads(call.function.arguments)
+    except json.JSONDecodeError:
+        return None, None, "Error: the arguments were not valid JSON."
+    if not isinstance(args, dict):
+        return None, None, "Error: the arguments must be a JSON object."
+
+    missing = [name for name in spec.required if name not in args]
+    if missing:
+        return None, None, f"Error: missing arguments: {', '.join(missing)}."
+
+    object_id = args.get("object_id")
+    if not isinstance(object_id, str) or object_id not in objects:
+        return None, None, "Error: object not visible."
+    return spec, args, None
+
+
 def run_instruction(instruction: str, attempter, max_rounds: int = 5, observe_fn=observe) -> str:
-    client = OpenAI(base_url="https://integrate.api.nvidia.com/v1",
-                    api_key=os.environ["LLM_API_KEY"], timeout=60)
+    client = make_client()
     registry = load_registry()
     tools = [spec.to_tool_schema() for spec in registry.values()]
     objects = observe_fn()
+    log.info("instruction: %s | camera sees: %s", instruction, objects)
     messages = [
         {"role": "system", "content": SYSTEM_PROMPT},
         {"role": "user", "content": f"Camera sees (x, y, z in meters): {objects}\n\nInstruction: {instruction}"},
@@ -28,27 +52,35 @@ def run_instruction(instruction: str, attempter, max_rounds: int = 5, observe_fn
 
     # round of conversations with the model up to max_rounds times
     for round_num in range(max_rounds):
-        # convo sent to VIM and wait for reply
-        response = client.chat.completions.create(model=MODEL, messages=messages, tools=tools)
+        # convo sent to NIM and wait for reply
+        try:
+            response = client.chat.completions.create(model=MODEL, messages=messages, tools=tools)
+        except APIError as error:
+            log.error("language model request failed: %s", type(error).__name__)
+            return f"stopped: the language model request failed ({type(error).__name__})"
+        if not response.choices:
+            log.error("language model sent an empty response")
+            return "stopped: the language model sent an empty response"
         message = response.choices[0].message
 
         # if theres nothing the model needs, returns message content
         if not message.tool_calls:
-            return message.content
+            return message.content or "stopped: the language model sent an empty reply"
 
         messages.append(message)
         for call in message.tool_calls:
-            spec = registry[call.function.name]
-            # converts JSON text into a dict 
-            args = json.loads(call.function.arguments)
-            if args["object_id"] not in objects:
-                messages.append({"role": "tool", "tool_call_id": call.id, "content": "Error: object not visible."})
+            spec, args, error = check_call(call, registry, objects)
+            # the model gets the error back, so it can correct itself or explain
+            if error:
+                log.warning("round %d: refused %s: %s", round_num, call.function.name, error)
+                messages.append({"role": "tool", "tool_call_id": call.id, "content": error})
                 continue
             # actually runs the skill and returns a SkillResult plus the reason
             result = run_skill(spec, args, attempter)
-            print(f"round {round_num}: {call.function.name}({args}) -> {result.outcome}")
+            log.info("round %d: %s(%s) -> %s", round_num, call.function.name, args, result.outcome)
             messages.append({"role": "tool", "tool_call_id": call.id, "content": result.model_dump_json()})
 
+    log.warning("stopped after %d rounds", max_rounds)
     return "stopped: too many rounds"
 
 

@@ -2,6 +2,7 @@ import json
 from types import SimpleNamespace
 
 import pytest
+from openai import APIError
 
 from planner import planner
 from skills.runner import AttemptResult
@@ -29,7 +30,10 @@ class FakeLLM:
     def create(self, **request):
         # copy the list, because the planner keeps adding to the one it passed in
         self.requests.append({**request, "messages": list(request["messages"])})
-        return SimpleNamespace(choices=[SimpleNamespace(message=self.replies.pop(0))])
+        reply = self.replies.pop(0)
+        if isinstance(reply, Exception):
+            raise reply
+        return SimpleNamespace(choices=[SimpleNamespace(message=reply)] if reply else [])
 
 
 class CountingAttempter:
@@ -44,11 +48,9 @@ class CountingAttempter:
 
 @pytest.fixture
 def run(monkeypatch):
-    monkeypatch.setenv("LLM_API_KEY", "not-a-real-key")
-
     def run_with(replies, attempter, seen=SEEN, **kwargs):
         llm = FakeLLM(replies)
-        monkeypatch.setattr(planner, "OpenAI", lambda **_: llm)
+        monkeypatch.setattr(planner, "make_client", lambda: llm)
         answer = planner.run_instruction("Pick up the cube.", attempter, observe_fn=lambda: seen, **kwargs)
         return answer, llm
 
@@ -103,24 +105,50 @@ def test_stops_when_the_llm_never_finishes(run):
     assert len(llm.requests) == 2
 
 
-# These are real crashes in planner.py. Step 3 fixes them, and strict=True then
-# fails these tests until the xfail marks are removed, so they can't be forgotten.
-@pytest.mark.xfail(strict=True, raises=KeyError, reason="made-up skill name crashes the planner")
-def test_made_up_skill_is_refused(run):
+class NetworkError(APIError):
+    def __init__(self):
+        pass
+
+
+@pytest.mark.parametrize("call, error", [
+    (tool_reply(name="fly"), "Error: there is no skill named fly."),
+    (tool_reply(arguments="{}"), "Error: missing arguments: object_id."),
+    (tool_reply(arguments="{oops"), "Error: the arguments were not valid JSON."),
+    (tool_reply(arguments="null"), "Error: the arguments must be a JSON object."),
+    (tool_reply(arguments='{"object_id": ["green_cube"]}'), "Error: object not visible."),
+])
+def test_bad_tool_call_is_refused_and_explained_to_the_llm(run, call, error):
     attempter = CountingAttempter()
-    run([tool_reply(name="fly"), text_reply("I cannot do that.")], attempter)
+    answer, llm = run([call, text_reply("Sorry about that.")], attempter)
+    assert answer == "Sorry about that."
     assert attempter.calls == 0
+    assert llm.requests[1]["messages"][-1]["content"] == error
 
 
-@pytest.mark.xfail(strict=True, raises=KeyError, reason="a missing object_id crashes the planner")
-def test_call_without_object_id_is_refused(run):
+def test_llm_can_correct_itself_after_a_bad_call(run):
     attempter = CountingAttempter()
-    run([tool_reply(arguments="{}"), text_reply("Which object?")], attempter)
-    assert attempter.calls == 0
+    answer, _ = run([tool_reply(arguments="{oops"), tool_reply(), text_reply("Done.")], attempter)
+    assert answer == "Done."
+    assert attempter.calls == 1
 
 
-@pytest.mark.xfail(strict=True, raises=json.JSONDecodeError, reason="broken JSON crashes the planner")
-def test_broken_json_is_refused(run):
+def test_failed_request_stops_with_a_clear_message(run):
+    answer, _ = run([NetworkError()], CountingAttempter())
+    assert answer == "stopped: the language model request failed (NetworkError)"
+
+
+def test_request_failure_after_a_pick_still_returns(run):
     attempter = CountingAttempter()
-    run([tool_reply(arguments="{oops"), text_reply("Sorry.")], attempter)
-    assert attempter.calls == 0
+    answer, _ = run([tool_reply(), NetworkError()], attempter)
+    assert attempter.calls == 1
+    assert answer.startswith("stopped:")
+
+
+def test_empty_response_stops_with_a_clear_message(run):
+    answer, _ = run([None], CountingAttempter())
+    assert answer == "stopped: the language model sent an empty response"
+
+
+def test_empty_reply_stops_with_a_clear_message(run):
+    answer, _ = run([text_reply(None)], CountingAttempter())
+    assert answer == "stopped: the language model sent an empty reply"

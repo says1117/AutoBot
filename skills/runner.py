@@ -3,6 +3,7 @@ from typing import Literal
 
 from pydantic import BaseModel
 
+from planner.runtime import log
 from skills.contract import SkillSpec
 
 OutcomeName = Literal["success", "failure", "timeout"]
@@ -36,6 +37,8 @@ class StubAttempter:
 def run_skill(spec: SkillSpec, args: dict, attempter: StubAttempter) -> SkillResult:
     for attempt_num in range(1, spec.max_attempts + 1):
         result = attempter.attempt(spec, args)
+        log.info("%s attempt %d of %d: %s (%s)", spec.name, attempt_num, spec.max_attempts,
+                 result.outcome, result.reason)
         action = getattr(spec.outcomes, result.outcome).next_action
         if action == "report":
             return SkillResult(skill=spec.name, outcome=result.outcome, attempts=attempt_num, reason=result.reason)

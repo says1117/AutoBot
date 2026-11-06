@@ -1,4 +1,5 @@
 import argparse
+import sys
 import time
 
 import mujoco
@@ -8,6 +9,7 @@ import numpy as np
 from perception.locate import CUBE_RGBA
 from perception.verify import VLMVerifier
 from planner.planner import run_instruction
+from planner.runtime import SetupError, setup_logging
 from sim.pick_world import PickWorld
 from skills.policy_attempter import PolicyAttempter
 
@@ -21,8 +23,11 @@ def show(viewer, model, data, qpos, mocap_pos):
 
 
 def main(instruction, episodes, object_id):
+    setup_logging()
+    # built first, so a missing key shows up before the slow startup
+    verifier = VLMVerifier()
     world = PickWorld(object_id=object_id)
-    attempter = PolicyAttempter(world, VLMVerifier())
+    attempter = PolicyAttempter(world, verifier)
 
     # the arm runs on the GPU, so save every step and replay it in the window
     frames = []
@@ -77,4 +82,7 @@ if __name__ == "__main__":
     parser.add_argument("--episodes", type=int, default=0, help="0 keeps going until the window is closed")
     parser.add_argument("--object", choices=list(CUBE_RGBA), help="leave out for a random color each episode")
     args = parser.parse_args()
-    main(args.instruction, args.episodes, args.object)
+    try:
+        main(args.instruction, args.episodes, args.object)
+    except SetupError as error:
+        sys.exit(f"setup error: {error}")

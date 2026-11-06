@@ -3,6 +3,7 @@ from pathlib import Path
 import yaml
 
 from skills.contract import SkillSpec
+
 # path of the parent of the file
 SKILLS_DIR = Path(__file__).parent
 
@@ -14,7 +15,7 @@ def load_registry() -> dict[str, SkillSpec]:
     for path in sorted(SKILLS_DIR.glob('*/skill.yaml')):
 
         # yaml data extracted from each skill.yaml file
-        data = yaml.safe_load(open(path))
+        data = yaml.safe_load(path.read_text())
         # returns SkillSpec object with yaml data
         spec = SkillSpec.model_validate(data)
         registry[spec.name] = spec

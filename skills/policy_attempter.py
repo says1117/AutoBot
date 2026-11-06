@@ -4,6 +4,7 @@ import jax.numpy as jp
 from brax.io import model
 
 from perception.pick_camera import CubeTracker, hide_cube_state
+from planner.runtime import SetupError, log
 from sim.pick_world import PickWorld
 from skills.contract import SkillSpec
 from skills.runner import AttemptResult
@@ -16,6 +17,8 @@ class PolicyAttempter:
     def __init__(self, world: PickWorld, verifier=None):
         self.world = world
         self.verifier = verifier
+        if not POLICY_PATH.exists():
+            raise SetupError(f"policy file not found: {POLICY_PATH}. It should come with the repo.")
         self.params = model.load_params(str(POLICY_PATH))
         self.box = world.env.mj_model.body("box").id
 
@@ -63,7 +66,11 @@ class PolicyAttempter:
         lifted = best_held >= hold_steps
         confirmed = self.verifier.confirm(world.side_photo(), args["object_id"]) if self.verifier else None
         if self.verifier:
-            print(f"photo check: {confirmed}, height rule: {lifted}", flush=True)
+            log.info("photo check: %s, height rule: %s", confirmed, lifted)
+            if confirmed is None:
+                log.warning("no answer from the photo check, so the height rule decides")
+            elif confirmed != lifted:
+                log.warning("the photo check and the height rule disagree")
         if confirmed is None:
             confirmed = lifted
         if confirmed:
