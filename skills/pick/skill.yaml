@@ -14,7 +14,7 @@ args:
   object_id:
     type: string
     description: Which object to pick up.
-    enum: [red_cube, blue_cube, green_cube]
+    enum: [red_cube, orange_cube, yellow_cube, green_cube, blue_cube, purple_cube]
 
 required: [object_id]
 

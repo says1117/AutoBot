@@ -1,4 +1,5 @@
 import math
+
 import cv2
 import numpy as np
 
@@ -6,12 +7,33 @@ import numpy as np
 # Red has two ranges because its hue wraps around the end of the scale.
 COLOR_RANGES = {
     "red_cube": [((0, 120, 60), (10, 255, 255)), ((170, 120, 60), (179, 255, 255))],
+    "orange_cube": [((11, 120, 60), (24, 255, 255))],
+    "yellow_cube": [((25, 120, 60), (35, 255, 255))],
     "green_cube": [((45, 120, 60), (75, 255, 255))],
-    "blue_cube": [((105, 120, 60), (130, 255, 255))],
+    # the training floor is blue too: hue 110 clears the floor, and saturation 200 clears
+    # the cube's reflection in it
+    "blue_cube": [((110, 200, 60), (130, 255, 255))],
+    "purple_cube": [((135, 120, 60), (155, 255, 255))],
+}
+
+# the paint for each cube, as red, green, blue, alpha from 0 to 1
+CUBE_RGBA = {
+    "red_cube": (1, 0, 0, 1),
+    # darker than pure orange, because bright light turns pure orange's top face yellow
+    "orange_cube": (0.7, 0.3, 0, 1),
+    "yellow_cube": (1, 1, 0, 1),
+    "green_cube": (0, 1, 0, 1),
+    "blue_cube": (0, 0, 1, 1),
+    "purple_cube": (0.6, 0, 1, 1),
 }
 
 # The camera sees the cube's surface, but we want its center.
 SURFACE_OFFSET = 0.025 * math.cos(math.radians(45))
+
+def is_corrupted(rgb):
+    # static jumps by about 70 between neighboring pixels, while a real photo barely changes
+    return np.abs(np.diff(rgb.astype(np.int16), axis=1)).mean() > 30
+
 
 def find_pixels(rgb, object_id):
     hsv = cv2.cvtColor(rgb, cv2.COLOR_RGB2HSV)

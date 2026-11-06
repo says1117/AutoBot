@@ -6,14 +6,20 @@ import mujoco
 import numpy as np
 
 from perception.camera import HEIGHT, WIDTH, capture
-from perception.locate import back_project, find_pixels
+from perception.locate import COLOR_RANGES, CUBE_RGBA, back_project, find_pixels, is_corrupted
 
 # looks back at the robot from in front of the table, so the arm does not block the cube
 CAMERA_XML = '<camera name="overhead" pos="1.4 0 0.7" xyaxes="0 1 0 -0.7071 0 0.7071" fovy="60"/>'
+# looks across the table from the side, so a photo shows how high the cube is off the floor
+SIDE_CAMERA_XML = '<camera name="side" pos="0.55 -1.4 0.4" xyaxes="1 0 0 0 0 1" fovy="45"/>'
 # measured distance from the cube's visible surface to its center, along the camera's view
 SURFACE_OFFSET = 0.017
 # once the gripper is this close to the estimate, the cube is assumed to move with it
 GRASP_DISTANCE = 0.015
+# under the floor, where the camera can't see it
+HIDDEN = (0, 0, -5)
+# a whole cube covers about 580 pixels, so fewer than this is not a cube
+MIN_PIXELS = 50
 
 
 class PickCamera:
@@ -21,23 +27,43 @@ class PickCamera:
 
     def __init__(self, env):
         xml = Path(env.xml_path).read_text()
-        xml = xml.replace("<worldbody>", "<worldbody>" + CAMERA_XML, 1)
+        xml = xml.replace("<worldbody>", "<worldbody>" + CAMERA_XML + SIDE_CAMERA_XML, 1)
         self.model = mujoco.MjModel.from_xml_string(xml, assets=env._model_assets)
         self.data = mujoco.MjData(self.model)
         self.renderer = mujoco.Renderer(self.model, HEIGHT, WIDTH)
+        self.cube_geoms = np.flatnonzero(self.model.geom_bodyid == self.model.body("box").id)
+        # the red target marker is a guide for people, and would look like a red cube
+        self.data.mocap_pos[:] = HIDDEN
 
-    def locate_cube(self, qpos, mocap_pos):
+    def paint_cube(self, object_id):
+        # only changes how the cube looks; the physics and the policy never see color
+        self.model.geom_rgba[self.cube_geoms] = CUBE_RGBA[object_id]
+
+    def take_photos(self, qpos, camera="overhead"):
         # copy the episode's state in, then take the photos
         self.data.qpos[:] = qpos
-        self.data.mocap_pos[:] = mocap_pos
         mujoco.mj_forward(self.model, self.data)
-        rgb, depth = capture(self.model, self.data, self.renderer)
+        rgb, depth = capture(self.model, self.data, self.renderer, camera)
+        # static contains every color, so it would otherwise look like six cubes
+        if is_corrupted(rgb):
+            raise RuntimeError("the camera returned a corrupted image")
+        return rgb, depth
 
-        xs, ys = find_pixels(rgb, "green_cube")
-        if len(xs) == 0:
+    def find_in_photos(self, rgb, depth, object_id):
+        xs, ys = find_pixels(rgb, object_id)
+        if len(xs) < MIN_PIXELS:
             return None
         z = float(np.median(depth[ys, xs])) + SURFACE_OFFSET
         return back_project(self.model, self.data, "overhead", xs.mean(), ys.mean(), z, WIDTH, HEIGHT)
+
+    def locate_cube(self, qpos, object_id):
+        return self.find_in_photos(*self.take_photos(qpos), object_id)
+
+    def see(self, qpos):
+        # searches for every color, so the label comes from the photo and not the simulator
+        rgb, depth = self.take_photos(qpos)
+        found = {name: self.find_in_photos(rgb, depth, name) for name in COLOR_RANGES}
+        return {name: position for name, position in found.items() if position is not None}
 
 
 class CubeTracker:

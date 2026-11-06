@@ -5,25 +5,33 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "autobot"
 version = "0.1.0"
-description = "Language-directed robot control in NVIDIA Isaac Sim"
-requires-python = ">=3.10"
+description = "Plain-English control of a simulated robot arm: LLM planner, RL skill, RGB-D vision, and VLM verification in MuJoCo"
+requires-python = ">=3.12,<3.13"
 dependencies = [
+    "mujoco>=3.17",
+    "numpy>=2.0",
+    "openai>=3.0",
+    "opencv-python-headless>=5.0",
     "pydantic>=2.0",
     "pyyaml>=6.0",
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=7.0", "ruff>=0.1"]
-
-# NOTE: isaaclab / isaacsim are intentionally NOT listed here.
-# planner/ and evals/ must stay importable without them so they run on a
-# laptop and in CPU-only CI. Only skills/isaac_runner.py and sim/ may
-# import Isaac. sim/ and csrc/ are not Python packages.
+# everything that runs the arm or trains it, which needs an NVIDIA GPU
+# exact versions, because brax 0.14.2 crashes on newer JAX
+sim = [
+    "brax==0.14.2",
+    "jax[cuda12]==0.9.2",
+    "playground==0.2.0",
+    "warp-lang==1.19.0",
+]
+dev = ["pytest>=9.0", "ruff>=0.16"]
 
 [tool.setuptools]
-packages = ["skills", "planner", "evals"]
+packages = ["evals", "perception", "planner", "sim", "skills", "training"]
 
 [tool.setuptools.package-data]
+sim = ["scene.xml"]
 skills = ["*/skill.yaml"]
 
 [tool.ruff]

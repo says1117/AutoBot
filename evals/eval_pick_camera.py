@@ -9,13 +9,16 @@ import numpy as np
 from brax.io import model
 
 from evals.eval_pick import ENV_NAME, RESULTS, build
+from perception.locate import CUBE_RGBA
 from perception.pick_camera import CubeTracker, PickCamera, hide_cube_state
+from skills.policy_attempter import POLICY_PATH
 from skills.registry import load_registry
 
 
-def evaluate(policy_path, n_episodes, seed):
+def evaluate(policy_path, n_episodes, seed, object_id):
     config, env, act, reset, step = build()
     camera = PickCamera(env)
+    camera.paint_cube(object_id)
     rule = load_registry()["pick"].outcomes.success
     hold_steps = round(rule.hold_s / config.ctrl_dt)
     box = env.mj_model.body("box").id
@@ -29,8 +32,8 @@ def evaluate(policy_path, n_episodes, seed):
     target = state.info["target_pos"]
 
     # one photo per episode, taken before the arm moves
-    qpos, mocap = np.array(state.data.qpos), np.array(state.data.mocap_pos)
-    found = [camera.locate_cube(qpos[i], mocap[i]) for i in range(n_episodes)]
+    qpos = np.array(state.data.qpos)
+    found = [camera.locate_cube(qpos[i], object_id) for i in range(n_episodes)]
     misses = sum(position is None for position in found)
     estimates = np.array([np.zeros(3) if p is None else p for p in found])
     seen = np.array([p is not None for p in found])
@@ -58,6 +61,7 @@ def evaluate(policy_path, n_episodes, seed):
     return {
         "policy": Path(policy_path).name,
         "attempter": "ppo_camera",
+        "object": object_id,
         "env": ENV_NAME,
         "episodes": n_episodes,
         "seed": seed,
@@ -74,16 +78,17 @@ def evaluate(policy_path, n_episodes, seed):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("policy")
+    parser.add_argument("policy", nargs="?", default=str(POLICY_PATH))
     parser.add_argument("--episodes", type=int, default=512)
     parser.add_argument("--seed", type=int, default=3000)
+    parser.add_argument("--object", choices=list(CUBE_RGBA), default="green_cube")
     args = parser.parse_args()
 
-    result = evaluate(args.policy, args.episodes, args.seed)
+    result = evaluate(args.policy, args.episodes, args.seed, args.object)
     print(result, flush=True)
 
     RESULTS.mkdir(exist_ok=True)
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output = RESULTS / f"pick_ppo_camera_{stamp}.json"
+    output = RESULTS / f"pick_ppo_camera_{args.object}_{stamp}.json"
     output.write_text(json.dumps(result, indent=2))
     print(f"saved {output}", flush=True)

@@ -8,22 +8,22 @@ from sim.pick_world import PickWorld
 from skills.contract import SkillSpec
 from skills.runner import AttemptResult
 
-POLICY_PATH = Path(__file__).parent.parent / "checkpoints" / "pick_policy_seed2"
-# the training scene has one cube, and it is green
-TRAINED_OBJECT = "green_cube"
+# tracked in git so a fresh clone can run; new training runs go to checkpoints/
+POLICY_PATH = Path(__file__).parent.parent / "models" / "pick_policy_seed2"
 
 
 class PolicyAttempter:
-    def __init__(self, world: PickWorld):
+    def __init__(self, world: PickWorld, verifier=None):
         self.world = world
+        self.verifier = verifier
         self.params = model.load_params(str(POLICY_PATH))
         self.box = world.env.mj_model.body("box").id
 
     def attempt(self, spec: SkillSpec, args: dict) -> AttemptResult:
-        if args["object_id"] != TRAINED_OBJECT:
-            return AttemptResult(outcome="failure", reason="no trained policy for this object")
-
         world = self.world
+        if args["object_id"] != world.object_id:
+            return AttemptResult(outcome="failure", reason="that object is not in the scene")
+
         # a retry starts with the arm at home and a new photo of wherever the cube is now
         if not world.arm_at_home:
             world.home_arm()
@@ -59,6 +59,13 @@ class PolicyAttempter:
             held = held + 1 if lift >= rule.threshold else 0
             best_held = max(best_held, held)
 
-        if best_held >= hold_steps:
+        # the simulator's height is what a real robot wouldn't have, so a photo decides
+        lifted = best_held >= hold_steps
+        confirmed = self.verifier.confirm(world.side_photo(), args["object_id"]) if self.verifier else None
+        if self.verifier:
+            print(f"photo check: {confirmed}, height rule: {lifted}", flush=True)
+        if confirmed is None:
+            confirmed = lifted
+        if confirmed:
             return AttemptResult(outcome="success")
-        return AttemptResult(outcome="failure", reason="object was not held at lift height")
+        return AttemptResult(outcome="failure", reason="the check found the object was not held")

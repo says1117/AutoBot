@@ -1,0 +1,584 @@
+{
+  "model": "nvidia/nemotron-3.5-super-vl-120b-a12b",
+  "camera": "side",
+  "seed": 3000,
+  "questions": 70,
+  "answered": 70,
+  "right": 64,
+  "said_yes": {
+    "held": {
+      "yes": 30,
+      "of": 30
+    },
+    "failed": {
+      "yes": 6,
+      "of": 30
+    },
+    "wrong_color": {
+      "yes": 0,
+      "of": 10
+    }
+  },
+  "details": [
+    {
+      "episode": 237,
+      "paint": "red_cube",
+      "asked": "red_cube",
+      "kind": "held",
+      "answer": true,
+      "lift_m": 0.4
+    },
+    {
+      "episode": 281,
+      "paint": "orange_cube",
+      "asked": "orange_cube",
+      "kind": "held",
+      "answer": true,
+      "lift_m": 0.317
+    },
+    {
+      "episode": 212,
+      "paint": "yellow_cube",
+      "asked": "yellow_cube",
+      "kind": "held",
+      "answer": true,
+      "lift_m": 0.247
+    },
+    {
+      "episode": 386,
+      "paint": "green_cube",
+      "asked": "green_cube",
+      "kind": "held",
+      "answer": true,
+      "lift_m": 0.397
+    },
+    {
+      "episode": 449,
+      "paint": "blue_cube",
+      "asked": "blue_cube",
+      "kind": "held",
+      "answer": true,
+      "lift_m": 0.286
+    },
+    {
+      "episode": 429,
+      "paint": "purple_cube",
+      "asked": "purple_cube",
+      "kind": "held",
+      "answer": true,
+      "lift_m": 0.351
+    },
+    {
+      "episode": 467,
+      "paint": "red_cube",
+      "asked": "red_cube",
+      "kind": "held",
+      "answer": true,
+      "lift_m": 0.338
+    },
+    {
+      "episode": 166,
+      "paint": "orange_cube",
+      "asked": "orange_cube",
+      "kind": "held",
+      "answer": true,
+      "lift_m": 0.252
+    },
+    {
+      "episode": 308,
+      "paint": "yellow_cube",
+      "asked": "yellow_cube",
+      "kind": "held",
+      "answer": true,
+      "lift_m": 0.227
+    },
+    {
+      "episode": 454,
+      "paint": "green_cube",
+      "asked": "green_cube",
+      "kind": "held",
+      "answer": true,
+      "lift_m": 0.292
+    },
+    {
+      "episode": 427,
+      "paint": "blue_cube",
+      "asked": "blue_cube",
+      "kind": "held",
+      "answer": true,
+      "lift_m": 0.373
+    },
+    {
+      "episode": 340,
+      "paint": "purple_cube",
+      "asked": "purple_cube",
+      "kind": "held",
+      "answer": true,
+      "lift_m": 0.339
+    },
+    {
+      "episode": 497,
+      "paint": "red_cube",
+      "asked": "red_cube",
+      "kind": "held",
+      "answer": true,
+      "lift_m": 0.335
+    },
+    {
+      "episode": 136,
+      "paint": "orange_cube",
+      "asked": "orange_cube",
+      "kind": "held",
+      "answer": true,
+      "lift_m": 0.348
+    },
+    {
+      "episode": 214,
+      "paint": "yellow_cube",
+      "asked": "yellow_cube",
+      "kind": "held",
+      "answer": true,
+      "lift_m": 0.222
+    },
+    {
+      "episode": 5,
+      "paint": "green_cube",
+      "asked": "green_cube",
+      "kind": "held",
+      "answer": true,
+      "lift_m": 0.378
+    },
+    {
+      "episode": 202,
+      "paint": "blue_cube",
+      "asked": "blue_cube",
+      "kind": "held",
+      "answer": true,
+      "lift_m": 0.343
+    },
+    {
+      "episode": 119,
+      "paint": "purple_cube",
+      "asked": "purple_cube",
+      "kind": "held",
+      "answer": true,
+      "lift_m": 0.32
+    },
+    {
+      "episode": 134,
+      "paint": "red_cube",
+      "asked": "red_cube",
+      "kind": "held",
+      "answer": true,
+      "lift_m": 0.345
+    },
+    {
+      "episode": 258,
+      "paint": "orange_cube",
+      "asked": "orange_cube",
+      "kind": "held",
+      "answer": true,
+      "lift_m": 0.267
+    },
+    {
+      "episode": 15,
+      "paint": "yellow_cube",
+      "asked": "yellow_cube",
+      "kind": "held",
+      "answer": true,
+      "lift_m": 0.385
+    },
+    {
+      "episode": 46,
+      "paint": "green_cube",
+      "asked": "green_cube",
+      "kind": "held",
+      "answer": true,
+      "lift_m": 0.252
+    },
+    {
+      "episode": 172,
+      "paint": "blue_cube",
+      "asked": "blue_cube",
+      "kind": "held",
+      "answer": true,
+      "lift_m": 0.373
+    },
+    {
+      "episode": 2,
+      "paint": "purple_cube",
+      "asked": "purple_cube",
+      "kind": "held",
+      "answer": true,
+      "lift_m": 0.303
+    },
+    {
+      "episode": 415,
+      "paint": "red_cube",
+      "asked": "red_cube",
+      "kind": "held",
+      "answer": true,
+      "lift_m": 0.244
+    },
+    {
+      "episode": 159,
+      "paint": "orange_cube",
+      "asked": "orange_cube",
+      "kind": "held",
+      "answer": true,
+      "lift_m": 0.313
+    },
+    {
+      "episode": 365,
+      "paint": "yellow_cube",
+      "asked": "yellow_cube",
+      "kind": "held",
+      "answer": true,
+      "lift_m": 0.216
+    },
+    {
+      "episode": 354,
+      "paint": "green_cube",
+      "asked": "green_cube",
+      "kind": "held",
+      "answer": true,
+      "lift_m": 0.286
+    },
+    {
+      "episode": 431,
+      "paint": "blue_cube",
+      "asked": "blue_cube",
+      "kind": "held",
+      "answer": true,
+      "lift_m": 0.267
+    },
+    {
+      "episode": 241,
+      "paint": "purple_cube",
+      "asked": "purple_cube",
+      "kind": "held",
+      "answer": true,
+      "lift_m": 0.418
+    },
+    {
+      "episode": 22,
+      "paint": "red_cube",
+      "asked": "red_cube",
+      "kind": "failed",
+      "answer": false,
+      "lift_m": 0.052
+    },
+    {
+      "episode": 50,
+      "paint": "orange_cube",
+      "asked": "orange_cube",
+      "kind": "failed",
+      "answer": false,
+      "lift_m": -0.01
+    },
+    {
+      "episode": 444,
+      "paint": "yellow_cube",
+      "asked": "yellow_cube",
+      "kind": "failed",
+      "answer": false,
+      "lift_m": -0.01
+    },
+    {
+      "episode": 127,
+      "paint": "green_cube",
+      "asked": "green_cube",
+      "kind": "failed",
+      "answer": false,
+      "lift_m": 0.022
+    },
+    {
+      "episode": 338,
+      "paint": "blue_cube",
+      "asked": "blue_cube",
+      "kind": "failed",
+      "answer": false,
+      "lift_m": -0.01
+    },
+    {
+      "episode": 485,
+      "paint": "purple_cube",
+      "asked": "purple_cube",
+      "kind": "failed",
+      "answer": true,
+      "lift_m": 0.059
+    },
+    {
+      "episode": 24,
+      "paint": "red_cube",
+      "asked": "red_cube",
+      "kind": "failed",
+      "answer": false,
+      "lift_m": -0.01
+    },
+    {
+      "episode": 210,
+      "paint": "orange_cube",
+      "asked": "orange_cube",
+      "kind": "failed",
+      "answer": false,
+      "lift_m": -0.0
+    },
+    {
+      "episode": 265,
+      "paint": "yellow_cube",
+      "asked": "yellow_cube",
+      "kind": "failed",
+      "answer": false,
+      "lift_m": -0.0
+    },
+    {
+      "episode": 306,
+      "paint": "green_cube",
+      "asked": "green_cube",
+      "kind": "failed",
+      "answer": false,
+      "lift_m": -0.0
+    },
+    {
+      "episode": 305,
+      "paint": "blue_cube",
+      "asked": "blue_cube",
+      "kind": "failed",
+      "answer": false,
+      "lift_m": 0.033
+    },
+    {
+      "episode": 36,
+      "paint": "purple_cube",
+      "asked": "purple_cube",
+      "kind": "failed",
+      "answer": false,
+      "lift_m": -0.0
+    },
+    {
+      "episode": 357,
+      "paint": "red_cube",
+      "asked": "red_cube",
+      "kind": "failed",
+      "answer": true,
+      "lift_m": 0.049
+    },
+    {
+      "episode": 297,
+      "paint": "orange_cube",
+      "asked": "orange_cube",
+      "kind": "failed",
+      "answer": false,
+      "lift_m": 0.021
+    },
+    {
+      "episode": 191,
+      "paint": "yellow_cube",
+      "asked": "yellow_cube",
+      "kind": "failed",
+      "answer": false,
+      "lift_m": -0.0
+    },
+    {
+      "episode": 52,
+      "paint": "green_cube",
+      "asked": "green_cube",
+      "kind": "failed",
+      "answer": false,
+      "lift_m": -0.01
+    },
+    {
+      "episode": 298,
+      "paint": "blue_cube",
+      "asked": "blue_cube",
+      "kind": "failed",
+      "answer": false,
+      "lift_m": 0.023
+    },
+    {
+      "episode": 369,
+      "paint": "purple_cube",
+      "asked": "purple_cube",
+      "kind": "failed",
+      "answer": true,
+      "lift_m": 0.059
+    },
+    {
+      "episode": 129,
+      "paint": "red_cube",
+      "asked": "red_cube",
+      "kind": "failed",
+      "answer": false,
+      "lift_m": 0.026
+    },
+    {
+      "episode": 16,
+      "paint": "orange_cube",
+      "asked": "orange_cube",
+      "kind": "failed",
+      "answer": false,
+      "lift_m": -0.002
+    },
+    {
+      "episode": 300,
+      "paint": "yellow_cube",
+      "asked": "yellow_cube",
+      "kind": "failed",
+      "answer": true,
+      "lift_m": 0.05
+    },
+    {
+      "episode": 53,
+      "paint": "green_cube",
+      "asked": "green_cube",
+      "kind": "failed",
+      "answer": true,
+      "lift_m": 0.098
+    },
+    {
+      "episode": 358,
+      "paint": "blue_cube",
+      "asked": "blue_cube",
+      "kind": "failed",
+      "answer": true,
+      "lift_m": 0.077
+    },
+    {
+      "episode": 307,
+      "paint": "purple_cube",
+      "asked": "purple_cube",
+      "kind": "failed",
+      "answer": false,
+      "lift_m": -0.01
+    },
+    {
+      "episode": 154,
+      "paint": "red_cube",
+      "asked": "red_cube",
+      "kind": "failed",
+      "answer": false,
+      "lift_m": -0.01
+    },
+    {
+      "episode": 288,
+      "paint": "orange_cube",
+      "asked": "orange_cube",
+      "kind": "failed",
+      "answer": false,
+      "lift_m": 0.028
+    },
+    {
+      "episode": 421,
+      "paint": "yellow_cube",
+      "asked": "yellow_cube",
+      "kind": "failed",
+      "answer": false,
+      "lift_m": 0.052
+    },
+    {
+      "episode": 304,
+      "paint": "green_cube",
+      "asked": "green_cube",
+      "kind": "failed",
+      "answer": false,
+      "lift_m": -0.01
+    },
+    {
+      "episode": 178,
+      "paint": "blue_cube",
+      "asked": "blue_cube",
+      "kind": "failed",
+      "answer": false,
+      "lift_m": 0.004
+    },
+    {
+      "episode": 31,
+      "paint": "purple_cube",
+      "asked": "purple_cube",
+      "kind": "failed",
+      "answer": false,
+      "lift_m": -0.01
+    },
+    {
+      "episode": 237,
+      "paint": "red_cube",
+      "asked": "green_cube",
+      "kind": "wrong_color",
+      "answer": false,
+      "lift_m": 0.4
+    },
+    {
+      "episode": 281,
+      "paint": "orange_cube",
+      "asked": "blue_cube",
+      "kind": "wrong_color",
+      "answer": false,
+      "lift_m": 0.317
+    },
+    {
+      "episode": 212,
+      "paint": "yellow_cube",
+      "asked": "purple_cube",
+      "kind": "wrong_color",
+      "answer": false,
+      "lift_m": 0.247
+    },
+    {
+      "episode": 386,
+      "paint": "green_cube",
+      "asked": "red_cube",
+      "kind": "wrong_color",
+      "answer": false,
+      "lift_m": 0.397
+    },
+    {
+      "episode": 449,
+      "paint": "blue_cube",
+      "asked": "orange_cube",
+      "kind": "wrong_color",
+      "answer": false,
+      "lift_m": 0.286
+    },
+    {
+      "episode": 429,
+      "paint": "purple_cube",
+      "asked": "yellow_cube",
+      "kind": "wrong_color",
+      "answer": false,
+      "lift_m": 0.351
+    },
+    {
+      "episode": 467,
+      "paint": "red_cube",
+      "asked": "green_cube",
+      "kind": "wrong_color",
+      "answer": false,
+      "lift_m": 0.338
+    },
+    {
+      "episode": 166,
+      "paint": "orange_cube",
+      "asked": "blue_cube",
+      "kind": "wrong_color",
+      "answer": false,
+      "lift_m": 0.252
+    },
+    {
+      "episode": 308,
+      "paint": "yellow_cube",
+      "asked": "purple_cube",
+      "kind": "wrong_color",
+      "answer": false,
+      "lift_m": 0.227
+    },
+    {
+      "episode": 454,
+      "paint": "green_cube",
+      "asked": "red_cube",
+      "kind": "wrong_color",
+      "answer": false,
+      "lift_m": 0.292
+    }
+  ]
+}

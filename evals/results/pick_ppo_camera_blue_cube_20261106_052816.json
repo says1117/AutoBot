@@ -1,0 +1,16 @@
+{
+  "policy": "pick_policy_seed2",
+  "attempter": "ppo_camera",
+  "object": "blue_cube",
+  "env": "PandaPickCube",
+  "episodes": 512,
+  "seed": 3000,
+  "lift_threshold_m": 0.1,
+  "hold_s": 1.0,
+  "successes": 479,
+  "success_rate": 0.935546875,
+  "camera_misses": 0,
+  "mean_camera_error_mm": 2.6,
+  "max_camera_error_mm": 16.0,
+  "mean_final_target_error_m": 0.042
+}

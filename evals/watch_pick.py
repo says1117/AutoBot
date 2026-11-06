@@ -5,6 +5,8 @@ import mujoco
 import mujoco.viewer
 import numpy as np
 
+from perception.locate import CUBE_RGBA
+from perception.verify import VLMVerifier
 from planner.planner import run_instruction
 from sim.pick_world import PickWorld
 from skills.policy_attempter import PolicyAttempter
@@ -18,9 +20,9 @@ def show(viewer, model, data, qpos, mocap_pos):
     viewer.sync()
 
 
-def main(instruction, episodes):
-    world = PickWorld()
-    attempter = PolicyAttempter(world)
+def main(instruction, episodes, object_id):
+    world = PickWorld(object_id=object_id)
+    attempter = PolicyAttempter(world, VLMVerifier())
 
     # the arm runs on the GPU, so save every step and replay it in the window
     frames = []
@@ -71,7 +73,8 @@ def main(instruction, episodes):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("instruction", nargs="?", default="Pick up the green cube.")
+    parser.add_argument("instruction", nargs="?", default="Pick up the cube.")
     parser.add_argument("--episodes", type=int, default=0, help="0 keeps going until the window is closed")
+    parser.add_argument("--object", choices=list(CUBE_RGBA), help="leave out for a random color each episode")
     args = parser.parse_args()
-    main(args.instruction, args.episodes)
+    main(args.instruction, args.episodes, args.object)
